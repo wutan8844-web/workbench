@@ -15,19 +15,19 @@ type MoreTab = 'tasks' | 'review' | 'memo' | 'english' | 'news' | 'settings'
 export function MorePage({ user }: { user: User | null }) {
   const [tab, setTab] = useState<MoreTab>('tasks')
   const tabs = [
-    { id: 'tasks' as const, label: '任务', icon: ListTodo },
-    { id: 'review' as const, label: '复盘', icon: ClipboardCheck },
-    { id: 'memo' as const, label: '备忘', icon: BookMarked },
-    { id: 'english' as const, label: '英语', icon: Brain },
-    { id: 'news' as const, label: 'AI 新闻', icon: Newspaper },
-    { id: 'settings' as const, label: '数据', icon: Settings2 },
+    { id: 'tasks' as const, label: '任务', detail: '安排与跟进', icon: ListTodo },
+    { id: 'review' as const, label: '复盘', detail: '每天 5 分钟', icon: ClipboardCheck },
+    { id: 'memo' as const, label: '备忘', detail: '随时记下来', icon: BookMarked },
+    { id: 'english' as const, label: '英语', detail: '今天 5 个词', icon: Brain },
+    { id: 'news' as const, label: 'AI 新闻', detail: '真实来源', icon: Newspaper },
+    { id: 'settings' as const, label: '数据', detail: '同步与备份', icon: Settings2 },
   ]
   return (
     <div className="more-page">
       <nav className="subtabs" aria-label="更多功能">
         {tabs.map((item) => {
           const Icon = item.icon
-          return <button className={tab === item.id ? 'active' : ''} key={item.id} onClick={() => setTab(item.id)}><Icon size={17} />{item.label}</button>
+          return <button className={tab === item.id ? 'active' : ''} key={item.id} onClick={() => setTab(item.id)}><Icon size={19} /><span><strong>{item.label}</strong><small>{item.detail}</small></span></button>
         })}
       </nav>
       {tab === 'tasks' && <TasksPanel user={user} />}

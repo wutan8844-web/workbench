@@ -47,7 +47,7 @@ export function HomePage({ user, go }: { user: User | null; go: (view: AppView) 
         </div>
       </section>
 
-      <section className="pulse-grid" aria-label="今日概况">
+      <section className="pulse-grid panel" aria-label="代码、基金与收支概况">
         <button className="pulse-card learn-pulse" onClick={() => go('learn')}>
           <span className="pulse-icon"><BookOpenText size={20} /></span>
           <span><small>代码进度</small><strong>{completed} / {LESSONS.length} 课</strong></span>

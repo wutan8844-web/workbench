@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { Cloud, CloudOff, LogOut } from 'lucide-react'
 import { supabase, isCloudConfigured } from './lib/supabase'
@@ -6,10 +6,11 @@ import type { AppView } from './types'
 import { AppNav } from './components/AppNav'
 import { AuthScreen } from './components/AuthScreen'
 import { HomePage } from './pages/HomePage'
-import { LearnPage } from './pages/LearnPage'
-import { FundsPage } from './pages/FundsPage'
-import { FinancePage } from './pages/FinancePage'
-import { MorePage } from './pages/MorePage'
+
+const LearnPage = lazy(() => import('./pages/LearnPage').then((module) => ({ default: module.LearnPage })))
+const FundsPage = lazy(() => import('./pages/FundsPage').then((module) => ({ default: module.FundsPage })))
+const FinancePage = lazy(() => import('./pages/FinancePage').then((module) => ({ default: module.FinancePage })))
+const MorePage = lazy(() => import('./pages/MorePage').then((module) => ({ default: module.MorePage })))
 
 const VIEW_TITLES: Record<AppView, string> = {
   home: '今天', learn: '代码课', funds: '基金', finance: '收支', more: '更多',
@@ -87,13 +88,15 @@ export default function App() {
           </div>
         </header>
 
-        <div className="page-stage">
-          {view === 'home' && <HomePage user={user} go={setView} />}
-          {view === 'learn' && <LearnPage user={user} />}
-          {view === 'funds' && <FundsPage user={user} />}
-          {view === 'finance' && <FinancePage user={user} />}
-          {view === 'more' && <MorePage user={user} />}
-        </div>
+        <Suspense fallback={<div className="page-loading"><span className="loading-mark">进</span><p>正在打开模块…</p></div>}>
+          <div className="page-stage">
+            {view === 'home' && <HomePage user={user} go={setView} />}
+            {view === 'learn' && <LearnPage user={user} />}
+            {view === 'funds' && <FundsPage user={user} />}
+            {view === 'finance' && <FinancePage user={user} />}
+            {view === 'more' && <MorePage user={user} />}
+          </div>
+        </Suspense>
       </main>
     </div>
   )

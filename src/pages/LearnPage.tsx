@@ -23,6 +23,7 @@ export function LearnPage({ user }: { user: User | null }) {
   const [showRoadmap, setShowRoadmap] = useState(false)
   const [seconds, setSeconds] = useState(20 * 60)
   const [timerRunning, setTimerRunning] = useState(false)
+  const [labPane, setLabPane] = useState<'code' | 'preview'>('code')
   const resumedAfterLoad = useRef(false)
 
   useEffect(() => {
@@ -57,7 +58,10 @@ export function LearnPage({ user }: { user: User | null }) {
   const completedCount = completedSet.size
   const percent = Math.round((completedCount / LESSONS.length) * 100)
 
-  const run = () => setPreviewKey((value) => value + 1)
+  const run = () => {
+    setPreviewKey((value) => value + 1)
+    setLabPane('preview')
+  }
   const check = () => {
     const nextResults = lesson.checks.map((item) => item.test(code))
     setResults(nextResults)
@@ -143,12 +147,16 @@ export function LearnPage({ user }: { user: User | null }) {
               <button className="text-button" onClick={() => setShowHint((value) => !value)}><Lightbulb size={16} /> {showHint ? '收起提示' : '需要提示'}</button>
             </div>
             {showHint && <div className="hint-box"><Lightbulb size={17} /><span>{lesson.hint}</span></div>}
+            <div className="lab-view-switch" aria-label="代码练习视图">
+              <button className={labPane === 'code' ? 'active' : ''} aria-pressed={labPane === 'code'} onClick={() => setLabPane('code')}>写代码</button>
+              <button className={labPane === 'preview' ? 'active' : ''} aria-pressed={labPane === 'preview'} onClick={() => setLabPane('preview')}>看结果</button>
+            </div>
             <div className="lab-grid">
-              <div className="editor-pane">
+              <div className={`editor-pane ${labPane !== 'code' ? 'mobile-hidden' : ''}`}>
                 <div className="pane-label"><span>你的代码</span><small>可直接修改</small></div>
                 <textarea className="code-editor" value={code} onChange={(event) => { setCode(event.target.value); setResults(null) }} spellCheck={false} aria-label="代码编辑器" />
               </div>
-              <div className="preview-pane">
+              <div className={`preview-pane ${labPane !== 'preview' ? 'mobile-hidden' : ''}`}>
                 <div className="pane-label"><span>运行结果</span><button onClick={run}>刷新</button></div>
                 <iframe key={previewKey} title="代码运行结果" sandbox="allow-scripts" srcDoc={buildPreview(code)} />
               </div>

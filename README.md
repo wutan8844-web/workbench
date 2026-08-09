@@ -29,3 +29,7 @@ pnpm dev
 仓库已包含 GitHub Pages 工作流。连接 Supabase 后，在 GitHub 仓库中配置两个 Actions Variables，再把 Pages Source 设为 GitHub Actions。
 
 旧版单文件已保存在 `legacy/index.v1.html`，没有覆盖。
+
+## 设计依据
+
+本轮手机端 UI 参考了 Actual Budget、freeCodeCamp、Homepage 和 Maybe Finance；架构、依赖、活跃度、坑点与采用边界见 [UI 开源项目调研](./docs/ui-open-source-research.md)。

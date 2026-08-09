@@ -400,6 +400,9 @@ h1, h2, h3, .brand-name, .twenty-mark { font-family: ui-rounded, "SF Pro Rounded
 .app-loading { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); }
 .loading-mark { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 15px 15px 15px 5px; background: var(--blue); color: white; font-weight: 900; box-shadow: 6px 6px 0 var(--amber); }
 .app-loading p { margin-top: 20px; font-size: 12px; }
+.page-loading { min-height: 42vh; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); }
+.page-loading .loading-mark { width: 42px; height: 42px; }
+.page-loading p { margin: 16px 0 0; font-size: 12px; }
 
 @media (min-width: 620px) {
   .app-main { padding-left: 26px; padding-right: 26px; }
@@ -478,6 +481,196 @@ h1, h2, h3, .brand-name, .twenty-mark { font-family: ui-rounded, "SF Pro Rounded
   .lesson-brief, .code-lab, .check-panel { padding: 16px; }
   .code-editor, .preview-pane iframe { height: 280px; }
   .lab-footer .button { flex: 1; }
+}
+
+/* UI v3：手机优先的“个人进度本” */
+:root {
+  --ink: #10213b;
+  --ink-2: #16355f;
+  --blue: #245eea;
+  --blue-dark: #1748c7;
+  --blue-soft: #edf2ff;
+  --amber: #f7b915;
+  --amber-soft: #fff6d9;
+  --cloud: #eef3f8;
+  --line: #d8e1ec;
+  --shadow: 0 10px 28px rgba(18, 47, 85, .08);
+  --shadow-soft: 0 3px 12px rgba(18, 47, 85, .055);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background:
+    linear-gradient(rgba(255,255,255,.42), rgba(255,255,255,0) 240px),
+    var(--cloud);
+}
+button { min-width: 44px; }
+.page-stage { max-width: 1120px; }
+.topbar { max-width: 1120px; min-height: 82px; }
+.topbar h1 { font-size: clamp(27px, 4vw, 33px); }
+.topbar-date { font-size: 12px; font-variant-numeric: tabular-nums; }
+.account-state { min-height: 44px; background: rgba(255,255,255,.82); box-shadow: 0 2px 10px rgba(18,47,85,.04); }
+.account-state .icon-button { width: 32px; height: 32px; }
+
+.panel { border-radius: 18px; box-shadow: var(--shadow-soft); }
+.button { min-height: 44px; border-radius: 12px; }
+.button.small { min-height: 38px; }
+.icon-button { min-width: 44px; width: 44px; height: 44px; }
+.account-state .icon-button { min-width: 32px; }
+.eyebrow { letter-spacing: .07em; }
+.negative, .profit-down, .profit-up, .fund-summary-main > strong, .balance-figure strong,
+.cash-flow-row strong, .month-balance strong, .pulse-card strong, .record-amount,
+.position-numbers strong, .quote-line { font-variant-numeric: tabular-nums; }
+
+/* 学习票：每天唯一的主动作，也是产品识别点 */
+.daily-ticket {
+  min-height: 224px;
+  padding: 26px 26px 26px 38px;
+  border-radius: 22px 22px 22px 8px;
+  background:
+    linear-gradient(115deg, rgba(255,255,255,.035), transparent 48%),
+    var(--ink-2);
+  box-shadow: 0 14px 34px rgba(19, 49, 88, .17);
+}
+.daily-ticket::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 1px dashed rgba(255,255,255,.12);
+  border-radius: 15px 15px 15px 4px;
+  pointer-events: none;
+}
+.daily-ticket::after { width: 210px; height: 210px; opacity: .42; }
+.ticket-copy h2 { font-size: clamp(28px, 7vw, 40px); }
+.ticket-copy p { margin-bottom: 18px; }
+.twenty-mark { width: 72px; height: 72px; border-radius: 18px 18px 18px 6px; transform: rotate(3deg); }
+.twenty-mark strong { font-size: 28px; }
+
+/* 三个最高频模块合并为一张快速账页，减少卡片套卡片 */
+.pulse-grid {
+  gap: 0;
+  grid-template-columns: 1fr;
+  overflow: hidden;
+  background: var(--paper);
+}
+.pulse-card {
+  min-height: 72px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 11px 13px;
+  box-shadow: none;
+}
+.pulse-card:last-child { border-bottom: 0; }
+.pulse-card:hover { background: #f8faff; }
+.pulse-icon { width: 40px; height: 40px; border-radius: 11px; }
+.pulse-card small { font-size: 10px; }
+.pulse-card strong { font-size: 14px; }
+
+.task-panel, .month-note, .consistency-note { padding: 17px; }
+.task-list { gap: 0; }
+.task-row {
+  min-height: 52px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+.task-row:last-child { border-bottom: 0; }
+.task-row:hover { background: #f7f9fc; }
+.task-check { border-radius: 7px; }
+.empty-invite { min-height: 82px; border-radius: 13px; }
+.consistency-note { background: #fff7dc; }
+
+/* 代码课：手机一次只做一件事，写完再看结果 */
+.lab-view-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: #e9eef5;
+}
+.lab-view-switch button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.lab-view-switch button.active { background: white; color: var(--blue); box-shadow: 0 2px 8px rgba(18,47,85,.08); }
+.mobile-hidden { display: none; }
+.lesson-list, .lesson-brief, .code-lab, .check-panel { border-radius: 18px; }
+.lesson-link { min-height: 72px; }
+.code-editor { font-size: 13px; }
+
+/* 更多功能固定六宫格，所有长期模块都能一眼看见 */
+.subtabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  overflow: visible;
+  padding: 0;
+}
+.subtabs button {
+  min-width: 0;
+  min-height: 72px;
+  padding: 10px 8px;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 14px;
+  background: rgba(255,255,255,.78);
+  text-align: left;
+}
+.subtabs button > svg { flex: 0 0 auto; }
+.subtabs button > span { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.subtabs button strong { color: var(--ink); font-size: 12px; }
+.subtabs button small { color: var(--muted); font-size: 8px; white-space: nowrap; }
+.subtabs button.active { border-color: #9fb6f5; background: white; box-shadow: inset 0 -3px 0 var(--blue), var(--shadow-soft); }
+.subtabs button.active > svg, .subtabs button.active strong { color: var(--blue); }
+
+.source-notice { border-radius: 13px; }
+.fund-summary, .finance-hero, .word-study-card { border-radius: 20px 20px 20px 8px; }
+.position-card, .note-card { border-radius: 14px; }
+.positions-section, .records-panel, .spending-chart, .category-panel { padding: 17px; }
+
+@media (min-width: 620px) {
+  .pulse-grid { grid-template-columns: repeat(3, 1fr); }
+  .pulse-card { border-bottom: 0; border-right: 1px solid var(--line); }
+  .pulse-card:last-child { border-right: 0; }
+  .subtabs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .subtabs button { min-height: 68px; }
+}
+
+@media (min-width: 900px) {
+  .lab-view-switch { display: none; }
+  .mobile-hidden { display: block; }
+  .daily-ticket { min-height: 255px; }
+  .topbar { min-height: 104px; }
+  .nav-button.active { background: transparent; }
+  .nav-button.active svg { filter: drop-shadow(0 3px 7px rgba(36,94,234,.2)); }
+}
+
+@media (max-width: 430px) {
+  .app-main { padding-left: 10px; padding-right: 10px; }
+  .topbar { min-height: 72px; padding: 3px 2px 0; }
+  .topbar h1 { font-size: 26px; margin-top: 1px; }
+  .account-state { padding: 5px; }
+  .daily-ticket { min-height: 228px; padding: 25px 17px 22px 31px; align-items: center; }
+  .ticket-copy h2 { max-width: 235px; padding-right: 0; margin-top: 8px; }
+  .ticket-copy p { max-width: 255px; padding-right: 38px; line-height: 1.6; }
+  .ticket-action { width: 100%; max-width: 255px; }
+  .twenty-mark { top: 17px; right: 15px; width: 60px; height: 60px; }
+  .twenty-mark strong { font-size: 24px; }
+  .pulse-card { min-height: 67px; }
+  .subtabs { gap: 6px; }
+  .subtabs button { min-height: 66px; padding: 8px 7px; gap: 7px; }
+  .subtabs button small { display: none; }
+  .lesson-brief, .code-lab, .check-panel { padding: 15px; }
+  .code-editor, .preview-pane iframe { height: 330px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
