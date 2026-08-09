@@ -10,6 +10,7 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
+    "@babel/runtime": "7.24.7",
     "@supabase/auth-js": "^2.112.2",
     "@supabase/functions-js": "^2.112.2",
     "@supabase/phoenix": "^0.4.5",
@@ -17,10 +18,16 @@
     "@supabase/realtime-js": "^2.112.2",
     "@supabase/storage-js": "^2.112.2",
     "@supabase/supabase-js": "^2.57.4",
+    "antd-mobile": "5.42.3",
+    "classnames": "2.3.2",
     "iceberg-js": "^0.8.1",
     "lucide-react": "^0.468.0",
+    "rc-motion": "2.4.4",
+    "rc-segmented": "~2.4.1",
+    "rc-util": "5.17.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-is": "18.2.0",
     "scheduler": "^0.27.0",
     "tslib": "^2.8.1",
     "workbox-window": "^7.3.0"

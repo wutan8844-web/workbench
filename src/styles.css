@@ -496,6 +496,10 @@ h1, h2, h3, .brand-name, .twenty-mark { font-family: ui-rounded, "SF Pro Rounded
   --line: #d8e1ec;
   --shadow: 0 10px 28px rgba(18, 47, 85, .08);
   --shadow-soft: 0 3px 12px rgba(18, 47, 85, .055);
+  --adm-color-primary: var(--blue);
+  --adm-color-success: var(--mint);
+  --adm-color-danger: var(--rose);
+  --adm-font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
 }
 
 html { scroll-behavior: smooth; }
@@ -505,6 +509,21 @@ body {
     var(--cloud);
 }
 button { min-width: 44px; }
+.app-nav {
+  left: 10px;
+  right: 10px;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  padding: 5px 7px;
+  overflow: hidden;
+  border: 1px solid rgba(202, 214, 229, .92);
+  border-radius: 20px;
+  background: rgba(255,255,255,.95);
+  box-shadow: 0 12px 34px rgba(18,47,85,.16);
+  backdrop-filter: blur(18px);
+}
+.nav-button { transition: color .16s ease, background .16s ease; }
+.nav-button svg { transition: transform .16s ease; }
+.nav-button:active svg { transform: scale(.9); }
 .page-stage { max-width: 1120px; }
 .topbar { max-width: 1120px; min-height: 82px; }
 .topbar h1 { font-size: clamp(27px, 4vw, 33px); }
@@ -563,6 +582,7 @@ button { min-width: 44px; }
 }
 .pulse-card:last-child { border-bottom: 0; }
 .pulse-card:hover { background: #f8faff; }
+.pulse-card > svg { transition: transform .16s ease, color .16s ease; }
 .pulse-icon { width: 40px; height: 40px; border-radius: 11px; }
 .pulse-card small { font-size: 10px; }
 .pulse-card strong { font-size: 14px; }
@@ -582,26 +602,26 @@ button { min-width: 44px; }
 .consistency-note { background: #fff7dc; }
 
 /* 代码课：手机一次只做一件事，写完再看结果 */
-.lab-view-switch {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
+.lab-view-switch.adm-segmented {
+  --segmented-background: #e9eef5;
+  --segmented-item-color: var(--muted);
+  --segmented-item-selected-background: white;
+  --segmented-item-selected-color: var(--blue);
+  display: flex;
   padding: 4px;
   margin-bottom: 10px;
   border-radius: 12px;
-  background: #e9eef5;
 }
-.lab-view-switch button {
+.lab-view-switch .adm-segmented-item,
+.lab-view-switch .adm-segmented-item-selected,
+.lab-view-switch .adm-segmented-thumb { border-radius: 9px; }
+.lab-view-switch .adm-segmented-item-label {
   min-height: 40px;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: var(--muted);
+  line-height: 40px;
   font-size: 12px;
   font-weight: 800;
-  cursor: pointer;
 }
-.lab-view-switch button.active { background: white; color: var(--blue); box-shadow: 0 2px 8px rgba(18,47,85,.08); }
+.course-progress { --track-width: 8px; --track-color: #e7ecf4; --fill-color: var(--blue); }
 .mobile-hidden { display: none; }
 .lesson-list, .lesson-brief, .code-lab, .check-panel { border-radius: 18px; }
 .lesson-link { min-height: 72px; }
@@ -624,8 +644,15 @@ button { min-width: 44px; }
   border-radius: 14px;
   background: rgba(255,255,255,.78);
   text-align: left;
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
 }
-.subtabs button > svg { flex: 0 0 auto; }
+.subtabs button > svg { flex: 0 0 auto; width: 32px; height: 32px; padding: 7px; border-radius: 10px; }
+.subtabs button:nth-child(1) > svg { color: var(--blue); background: var(--blue-soft); }
+.subtabs button:nth-child(2) > svg { color: var(--mint); background: var(--mint-soft); }
+.subtabs button:nth-child(3) > svg { color: #8b6900; background: var(--amber-soft); }
+.subtabs button:nth-child(4) > svg { color: #7252c7; background: #f1edff; }
+.subtabs button:nth-child(5) > svg { color: var(--rose); background: var(--rose-soft); }
+.subtabs button:nth-child(6) > svg { color: #536178; background: #edf1f6; }
 .subtabs button > span { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .subtabs button strong { color: var(--ink); font-size: 12px; }
 .subtabs button small { color: var(--muted); font-size: 8px; white-space: nowrap; }
@@ -646,7 +673,19 @@ button { min-width: 44px; }
 }
 
 @media (min-width: 900px) {
-  .lab-view-switch { display: none; }
+  .app-nav {
+    left: 0;
+    right: auto;
+    bottom: 0;
+    padding: 22px 10px;
+    overflow: visible;
+    border: 0;
+    border-right: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: none;
+    background: rgba(255,255,255,.9);
+  }
+  .code-lab .lab-view-switch.adm-segmented { display: none; }
   .mobile-hidden { display: block; }
   .daily-ticket { min-height: 255px; }
   .topbar { min-height: 104px; }
@@ -660,7 +699,7 @@ button { min-width: 44px; }
   .topbar h1 { font-size: 26px; margin-top: 1px; }
   .account-state { padding: 5px; }
   .daily-ticket { min-height: 228px; padding: 25px 17px 22px 31px; align-items: center; }
-  .ticket-copy h2 { max-width: 235px; padding-right: 0; margin-top: 8px; }
+  .ticket-copy h2 { max-width: 100%; padding-right: 70px; margin-top: 8px; }
   .ticket-copy p { max-width: 255px; padding-right: 38px; line-height: 1.6; }
   .ticket-action { width: 100%; max-width: 255px; }
   .twenty-mark { top: 17px; right: 15px; width: 60px; height: 60px; }
@@ -669,8 +708,25 @@ button { min-width: 44px; }
   .subtabs { gap: 6px; }
   .subtabs button { min-height: 66px; padding: 8px 7px; gap: 7px; }
   .subtabs button small { display: none; }
+  .full-task-row { grid-template-columns: auto minmax(0,1fr) auto auto; }
+  .full-task-row .status-label { display: none; }
   .lesson-brief, .code-lab, .check-panel { padding: 15px; }
   .code-editor, .preview-pane iframe { height: 330px; }
+}
+
+@media (max-width: 360px) {
+  .subtabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .subtabs button { min-height: 70px; }
+  .subtabs button small { display: block; }
+  .fund-summary { padding: 20px; }
+  .fund-summary-actions { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .fund-summary-actions .button { min-width: 0; padding-left: 9px; padding-right: 9px; font-size: 11px; }
+}
+
+@media (hover: hover) {
+  .pulse-card:hover > svg { color: var(--blue); transform: translateX(3px); }
+  .subtabs button:hover { transform: translateY(-2px); border-color: #b7c5d9; box-shadow: 0 8px 18px rgba(18,47,85,.08); }
+  .ticket-action:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(247,185,21,.25); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -20,6 +20,15 @@
 | Homepage | Next.js/React；YAML 驱动的小组件；SWR、Recharts、Tailwind；大量服务集成。详见[根 package.json](https://github.com/gethomepage/homepage/blob/dev/package.json)。 | 约 30.4k stars；2026-05 仍有版本发布；维护活跃。 | 模块采用相同入口结构：图标、标题、关键值、状态；首页快速扫读。 | 默认没有认证层；大量代理接口和 Docker/自托管依赖不适合 GitHub Pages。 | 复用统一模块外观，不复制服务端代理与集成依赖。 |
 | Maybe Finance | Rails/PostgreSQL/Redis；Turbo/Stimulus、ViewComponent、Tailwind、Sidekiq、Plaid、Stripe。详见[Gemfile](https://github.com/maybe-finance/maybe/blob/main/Gemfile)。 | 约 54k stars，但项目于 2025-07-27 归档；不再活跃。 | 首页先回答“有多少钱、收支是否平衡、钱花在哪”，减少无用图表。 | 已归档；AGPL；商标限制；Rails 与银行聚合链路过重，且维护者明确提到第三方银行数据不稳定、缓存一致性困难。 | 只取视觉减法，不复制代码、品牌或技术方案。 |
 
+## 可直接接入的 UI 方案
+
+| 方案 | 能否直接用于当前项目 | 结论 |
+| --- | --- | --- |
+| [Ant Design Mobile](https://github.com/ant-design/ant-design-mobile) | 可以。MIT；React 手机网页组件；当前 5.42.x 明确兼容 React 19；支持按组件引入和 CSS 变量换肤。 | **采用。** 接入代码区 Segmented 和课程 ProgressBar，保留工作台自己的学习票与轻量导航。总入口在当前 pnpm hoisted 配置下会连带解析未使用的表单模块，因此改为组件目录按需导入并固定实际运行依赖；动画子依赖仍声明到 React 18，暂不使用动画较重的组件。 |
+| [TDesign Mobile React](https://github.com/Tencent/tdesign-mobile-react) | 技术上可以，但 README 目前只声明 React 18.x，社区和发布规模明显更小。 | 暂不采用，避免给现有 React 19 项目增加兼容风险。 |
+| [shadcn/ui](https://github.com/shadcn-ui/ui) | 组件代码可复制且为 MIT，但主要依赖 Tailwind/现代桌面 Web 的样式组织。 | 不采用为主框架；为了少量组件引入 Tailwind 会形成第二套样式体系。 |
+| [Tabler](https://github.com/tabler/tabler) | 模板完整、MIT、界面成熟，但核心是 Bootstrap HTML Dashboard。 | 不采用；桌面管理后台导向太强，与手机长期使用的工作台不匹配。 |
+
 ## 这次落地的设计规则
 
 - 手机首屏只保留一个主动作：继续今天的 20 分钟代码课。

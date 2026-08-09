@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
+import ProgressBar from 'antd-mobile/es/components/progress-bar'
+import Segmented from 'antd-mobile/es/components/segmented'
 import { Check, CheckCircle2, ChevronRight, Circle, Clock3, Lightbulb, Pause, Play, RotateCcw, Route, Sparkles } from 'lucide-react'
 import { LESSONS, ROADMAP, nextLesson } from '../data/curriculum'
 import { useCollection } from '../hooks/useCollection'
@@ -89,7 +91,7 @@ export function LearnPage({ user }: { user: User | null }) {
         <div className="course-progress-copy">
           <span className="eyebrow">从零做网站 · 第一阶段</span>
           <h2>已完成 {completedCount} 课</h2>
-          <div className="progress-track"><i style={{ width: `${percent}%` }} /></div>
+          <ProgressBar className="course-progress" percent={percent} rounded />
           <small>{percent}% · 完成练习才能计入进度</small>
         </div>
         <button className="button quiet" onClick={() => setShowRoadmap((value) => !value)}><Route size={17} /> 全年路线</button>
@@ -147,10 +149,13 @@ export function LearnPage({ user }: { user: User | null }) {
               <button className="text-button" onClick={() => setShowHint((value) => !value)}><Lightbulb size={16} /> {showHint ? '收起提示' : '需要提示'}</button>
             </div>
             {showHint && <div className="hint-box"><Lightbulb size={17} /><span>{lesson.hint}</span></div>}
-            <div className="lab-view-switch" aria-label="代码练习视图">
-              <button className={labPane === 'code' ? 'active' : ''} aria-pressed={labPane === 'code'} onClick={() => setLabPane('code')}>写代码</button>
-              <button className={labPane === 'preview' ? 'active' : ''} aria-pressed={labPane === 'preview'} onClick={() => setLabPane('preview')}>看结果</button>
-            </div>
+            <Segmented
+              className="lab-view-switch"
+              block
+              value={labPane}
+              options={[{ label: '写代码', value: 'code' }, { label: '看结果', value: 'preview' }]}
+              onChange={(value) => setLabPane(value as 'code' | 'preview')}
+            />
             <div className="lab-grid">
               <div className={`editor-pane ${labPane !== 'code' ? 'mobile-hidden' : ''}`}>
                 <div className="pane-label"><span>你的代码</span><small>可直接修改</small></div>
