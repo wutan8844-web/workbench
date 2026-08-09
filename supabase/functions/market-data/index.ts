@@ -1,8 +1,5 @@
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+import { withSupabase } from 'jsr:@supabase/server@^1'
 
 type SearchResponse = {
   ErrCode: number
@@ -14,12 +11,12 @@ type HistoryResponse = {
   Data?: { LSJZList?: Array<{ FSRQ: string; DWJZ: string; JZZZL: string }> }
 }
 
-Deno.serve(async (request) => {
-  if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+export default {
+  fetch: withSupabase({ auth: ['user'] }, async (request) => {
   try {
     const { code } = await request.json() as { code?: string }
     if (!code || !/^\d{6}$/.test(code)) {
-      return Response.json({ error: '基金代码应为 6 位数字。' }, { status: 400, headers: corsHeaders })
+      return Response.json({ error: '基金代码应为 6 位数字。' }, { status: 400 })
     }
 
     const headers = { 'Referer': 'https://fund.eastmoney.com/', 'User-Agent': 'GrowthLedger/2.0' }
@@ -33,7 +30,7 @@ Deno.serve(async (request) => {
     const fund = search.Datas?.find((item) => item.CODE === code)
     const latest = history.Data?.LSJZList?.[0]
     if (!fund || !latest || !(Number(latest.DWJZ) > 0)) {
-      return Response.json({ error: '未找到该基金或最新净值。' }, { status: 404, headers: corsHeaders })
+      return Response.json({ error: '未找到该基金或最新净值。' }, { status: 404 })
     }
     const valueTime = new Date(`${latest.FSRQ}T15:00:00+08:00`).getTime()
     const quote = {
@@ -47,9 +44,10 @@ Deno.serve(async (request) => {
       status: !Number.isFinite(valueTime) || Date.now() - valueTime > 7 * 86400000 ? 'stale' : 'fresh',
     }
     return Response.json({ quote }, {
-      headers: { ...corsHeaders, 'Cache-Control': 'public, max-age=300, s-maxage=300' },
+      headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300' },
     })
   } catch (error) {
-    return Response.json({ error: error instanceof Error ? error.message : '净值请求失败。' }, { status: 502, headers: corsHeaders })
+    return Response.json({ error: error instanceof Error ? error.message : '净值请求失败。' }, { status: 502 })
   }
-})
+  }),
+}

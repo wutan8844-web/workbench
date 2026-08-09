@@ -9,16 +9,9 @@
 3. 运行 `supabase/migrations/202608090001_initial.sql` 的全部内容。
 4. 确认七张个人数据表都显示 RLS 已启用。
 
-## 2. 配置邮箱验证码
+## 2. 配置邮箱登录
 
-在 Authentication → Email Templates → Magic Link 中使用 `{{ .Token }}` 显示 6 位验证码。示例正文：
-
-```html
-<h2>进度本登录验证码</h2>
-<p>你的验证码是：</p>
-<p style="font-size:32px;font-weight:700;letter-spacing:8px">{{ .Token }}</p>
-<p>验证码仅用于本次登录，请勿转发。</p>
-```
+免费项目可直接使用 Supabase 默认的 Magic Link 邮件：用户输入邮箱后，到邮件里点击 `Sign in` 即可登录。默认邮件模板不需要修改；以后接入自有 SMTP 后再定制中文邮件内容。
 
 在 Authentication → URL Configuration 中：
 
@@ -32,11 +25,11 @@
 用 Supabase CLI 登录并连接项目后运行：
 
 ```bash
-supabase functions deploy market-data --no-verify-jwt
-supabase functions deploy news-feed --no-verify-jwt
+supabase functions deploy market-data
+supabase functions deploy news-feed
 ```
 
-基金函数读取天天基金公开的最新正式净值与单日涨跌；页面不使用已经失效的旧盘中估算接口。新闻函数聚合 OpenAI、Google DeepMind、Hugging Face 和 arXiv 的公开 RSS/Atom 内容。
+两个函数只接受已登录用户的请求。基金函数读取天天基金公开的最新正式净值与单日涨跌；页面不使用已经失效的旧盘中估算接口。新闻函数聚合 OpenAI、Google DeepMind、Hugging Face 和 arXiv 的公开 RSS/Atom 内容。
 
 ## 4. 本地连接
 

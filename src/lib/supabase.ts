@@ -17,15 +17,10 @@ export const supabase = isCloudConfigured
 
 export async function requestEmailCode(email: string) {
   if (!supabase) throw new Error('尚未连接 Supabase')
+  const emailRedirectTo = new URL(import.meta.env.BASE_URL, window.location.origin).toString()
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: true },
+    options: { shouldCreateUser: true, emailRedirectTo },
   })
-  if (error) throw error
-}
-
-export async function verifyEmailCode(email: string, token: string) {
-  if (!supabase) throw new Error('尚未连接 Supabase')
-  const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
   if (error) throw error
 }

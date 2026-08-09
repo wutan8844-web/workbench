@@ -1,8 +1,5 @@
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+import { withSupabase } from 'jsr:@supabase/server@^1'
 
 const feeds = [
   { source: 'OpenAI', url: 'https://openai.com/news/rss.xml' },
@@ -34,8 +31,8 @@ function parseFeed(xml: string, source: string) {
   }).filter((item) => item.title && /^https?:\/\//.test(item.url))
 }
 
-Deno.serve(async (request) => {
-  if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+export default {
+  fetch: withSupabase({ auth: ['user'] }, async () => {
   const settled = await Promise.allSettled(feeds.map(async (feed) => {
     const response = await fetch(feed.url, { headers: { 'User-Agent': 'GrowthLedger/2.0' } })
     if (!response.ok) throw new Error(`${feed.source}: ${response.status}`)
@@ -46,6 +43,7 @@ Deno.serve(async (request) => {
     .slice(0, 30)
   return Response.json({ items, fetchedAt: new Date().toISOString() }, {
     status: items.length ? 200 : 502,
-    headers: { ...corsHeaders, 'Cache-Control': 'public, max-age=900, s-maxage=1800' },
+    headers: { 'Cache-Control': 'public, max-age=900, s-maxage=1800' },
   })
-})
+  }),
+}
