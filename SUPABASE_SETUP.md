@@ -9,16 +9,19 @@
 3. 运行 `supabase/migrations/202608090001_initial.sql` 的全部内容。
 4. 确认七张个人数据表都显示 RLS 已启用。
 
-## 2. 配置邮箱登录
+## 2. 配置 GitHub 登录
 
-免费项目可直接使用 Supabase 默认的 Magic Link 邮件：用户输入邮箱后，到邮件里点击 `Sign in` 即可登录。默认邮件模板不需要修改；以后接入自有 SMTP 后再定制中文邮件内容。
+1. 在 GitHub → Settings → Developer settings → OAuth Apps 创建应用。
+2. Homepage URL 填最终的 GitHub Pages 地址。
+3. Authorization callback URL 填 `https://你的项目.supabase.co/auth/v1/callback`。
+4. 在 Supabase → Authentication → Sign In / Providers → GitHub 中填写 Client ID 和 Client Secret，并启用 GitHub。
 
 在 Authentication → URL Configuration 中：
 
 - Site URL 填最终的 GitHub Pages 地址。
 - Redirect URLs 同时加入本地 `http://localhost:5173/**` 和 GitHub Pages 地址。
 
-登录会话默认持久保存并自动续期，正常使用不需要每天重新登录。
+GitHub 登录会话默认持久保存并自动续期，正常使用不需要每天重新登录。
 
 ## 3. 部署真实数据函数
 

@@ -1,26 +1,18 @@
 import { useState } from 'react'
-import { ArrowRight, CheckCircle2, Mail } from 'lucide-react'
-import { requestEmailCode } from '../lib/supabase'
+import { ArrowRight, CheckCircle2, Github } from 'lucide-react'
+import { signInWithGitHub } from '../lib/supabase'
 
 export function AuthScreen() {
-  const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
 
-  const send = async () => {
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setMessage('请先输入正确的邮箱地址。')
-      return
-    }
+  const login = async () => {
     setBusy(true)
     setMessage('')
     try {
-      await requestEmailCode(email)
-      setSent(true)
-      setMessage('登录邮件已发送。打开邮件，点击里面的 Sign in 即可进入工作台。')
+      await signInWithGitHub()
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : '登录邮件发送失败。')
+      setMessage(error instanceof Error ? error.message : 'GitHub 登录没有成功，请重试。')
     } finally {
       setBusy(false)
     }
@@ -40,19 +32,13 @@ export function AuthScreen() {
       </section>
       <section className="auth-card">
         <div className="brand-mark auth-logo">进</div>
-        <h2>{sent ? '去邮箱点登录链接' : '登录进度本'}</h2>
-        <p>{sent ? `登录邮件已发送到 ${email}` : '首次登录也会自动创建账户'}</p>
-        <label className="field-label" htmlFor="email">邮箱</label>
-        <div className="input-with-icon">
-          <Mail size={18} />
-          <input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} disabled={sent} placeholder="name@example.com" />
-        </div>
+        <h2>登录进度本</h2>
+        <p>不需要邮箱验证码，在 GitHub 确认后会自动回来</p>
         {message && <p className="form-message" role="status">{message}</p>}
-        <button className="button primary auth-submit" onClick={send} disabled={busy}>
-          {busy ? '正在处理…' : sent ? '重新发送邮件' : '发送登录邮件'} <ArrowRight size={18} />
+        <button className="button primary auth-submit" onClick={login} disabled={busy}>
+          <Github size={19} /> {busy ? '正在打开 GitHub…' : '使用 GitHub 登录'} <ArrowRight size={18} />
         </button>
-        {sent && <button className="text-button" onClick={() => { setSent(false); setMessage('') }}>换一个邮箱</button>}
-        <small>登录状态会保存在这台设备，正常使用无需每次验证。</small>
+        <small>第一次需要确认授权。之后会保持登录，正常使用不用重复操作。</small>
       </section>
     </main>
   )
