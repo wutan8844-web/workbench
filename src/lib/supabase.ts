@@ -17,7 +17,7 @@ export const supabase = isCloudConfigured
 
 export async function signInWithGitHub() {
   if (!supabase) throw new Error('尚未连接 Supabase')
-  const redirectTo = new URL(import.meta.env.BASE_URL, window.location.origin).toString()
+  const redirectTo = new URL(import.meta.env.BASE_URL, window.location.href).toString()
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: { redirectTo },
