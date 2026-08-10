@@ -1,15 +1,22 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
-import { AlertTriangle, ArrowDownRight, ArrowUpRight, Clock3, Plus, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react'
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, Clock3, MessageSquareText, Plus, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react'
 import { Modal } from '../components/Modal'
 import { useCollection } from '../hooks/useCollection'
 import { fetchFundQuote, fetchQuotes } from '../lib/fundApi'
 import { formatDateTime, makeId, money } from '../lib/format'
+import { applyBuy, matchFund, parseBuyInput } from '../lib/fundChat'
+import { supabase } from '../lib/supabase'
 import type { FundPosition, FundQuote } from '../types'
 
 type FundDraft = { code: string; shares: string; cost: string; groupName: string }
 
 const emptyDraft: FundDraft = { code: '', shares: '', cost: '', groupName: '我的持仓' }
+
+const round4 = (value: number) => Math.round(value * 1e4) / 1e4
+const round6 = (value: number) => Math.round(value * 1e6) / 1e6
+
+type ChatMessage = { type: 'ok' | 'err'; text: string }
 
 export function FundsPage({ user }: { user: User | null }) {
   const positions = useCollection('funds', user)
@@ -19,6 +26,55 @@ export function FundsPage({ user }: { user: User | null }) {
   const [draft, setDraft] = useState<FundDraft>(emptyDraft)
   const [formError, setFormError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [chatText, setChatText] = useState('')
+  const [chatMsg, setChatMsg] = useState<ChatMessage | null>(null)
+  const [chatBusy, setChatBusy] = useState(false)
+
+  const handleChatSubmit = async () => {
+    setChatMsg(null)
+    const input = chatText.trim()
+    if (!input) return
+    const parsed = parseBuyInput(input)
+    if ('error' in parsed) { setChatMsg({ type: 'err', text: parsed.error }); return }
+    if (!positions.items.length) { setChatMsg({ type: 'err', text: '还没有持仓。请先在上方「添加基金」录入持仓,才能对话记账。' }); return }
+    const matched = matchFund(parsed.fundText, positions.items)
+    if (!matched) {
+      const list = positions.items.map((item) => `· ${item.name}(${item.code})`).join('\n')
+      setChatMsg({ type: 'err', text: `没有找到匹配的基金「${parsed.fundText}」。\n当前持仓:\n${list}\n\n例如:买入 500 中证500 / 买 50 黄金 / 买了100 2611` })
+      return
+    }
+    const position = positions.items.find((item) => item.code === matched.code)
+    if (!position) return
+    setChatBusy(true)
+    try {
+      const quote = await fetchFundQuote(matched.code)
+      const nav = quote.nav
+      if (!(nav > 0)) { setChatMsg({ type: 'err', text: '暂时拿不到该基金最新正式净值,请稍后再试。' }); return }
+      const { newShares, totalShares, newCost } = applyBuy(position, parsed.amount, nav)
+      positions.setItems((current) => current.map((item) => item.code === matched.code
+        ? { ...item, shares: round4(totalShares), cost: round6(newCost) }
+        : item))
+      if (supabase) {
+        await supabase.from('fund_trades').insert({
+          fund_code: matched.code,
+          fund_name: matched.name,
+          trade_type: 'buy',
+          amount: parsed.amount,
+          nav,
+          shares: round4(newShares),
+          fee: 0,
+          trade_date: new Date().toISOString().slice(0, 10),
+          note: '工作台对话记账',
+        })
+      }
+      setChatText('')
+      setChatMsg({ type: 'ok', text: `已记录:买入 ${matched.name} ${parsed.amount} 元\n净值 ${nav.toFixed(4)} · 新增份额 ${round4(newShares)}\n最新份额 ${round4(totalShares)} · 新成本净值 ${round6(newCost)}` })
+    } catch (error) {
+      setChatMsg({ type: 'err', text: error instanceof Error ? error.message : '记账失败,请稍后再试。' })
+    } finally {
+      setChatBusy(false)
+    }
+  }
 
   const refresh = async () => {
     if (!positions.items.length) return
@@ -97,7 +153,25 @@ export function FundsPage({ user }: { user: User | null }) {
 
       <section className="source-notice">
         <AlertTriangle size={19} />
-        <p><strong>这里显示基金公司披露后的最新单位净值，不编造盘中估算。</strong>交易日通常在收盘后更新；本页只用于持仓记录，不提供投资建议。</p>
+        <p><strong>这里显示基金公司披露后的最新单位净值,不编造盘中估算。</strong>交易日通常在收盘后更新;本页只用于持仓记录,不提供投资建议。</p>
+      </section>
+
+      <section className="panel fund-chat">
+        <div className="section-heading">
+          <div><span className="eyebrow">对话记账</span><h2><MessageSquareText size={19} /> 说一句,记一笔</h2></div>
+        </div>
+        <p className="fund-chat-hint">输入买入指令,自动按当日净值折算份额、重新计算平均成本。例如:「买入 500 中证500」「买 50 黄金」「买了100 2611」</p>
+        <div className="fund-chat-row">
+          <input
+            value={chatText}
+            onChange={(event) => setChatText(event.target.value)}
+            onKeyDown={(event) => { if (event.key === 'Enter') void handleChatSubmit() }}
+            placeholder="例如:买入 500 中证500"
+            disabled={chatBusy}
+          />
+          <button className="button primary" onClick={() => void handleChatSubmit()} disabled={chatBusy}>{chatBusy ? '记账中…' : '记账'}</button>
+        </div>
+        {chatMsg && <p className={chatMsg.type === 'ok' ? 'form-message' : 'form-message error'}>{chatMsg.text}</p>}
       </section>
 
       <section className="positions-section panel">

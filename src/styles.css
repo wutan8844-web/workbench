@@ -197,6 +197,13 @@ h1, h2, h3, .brand-name, .twenty-mark { font-family: ui-rounded, "SF Pro Rounded
 .source-notice svg { flex: 0 0 auto; margin-top: 1px; }
 .source-notice p { margin: 0; font-size: 11px; line-height: 1.65; }
 .positions-section { padding: 18px; }
+.fund-chat { padding: 18px; }
+.fund-chat .section-heading h2 { display: flex; align-items: center; gap: 8px; }
+.fund-chat-hint { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 0 0 12px; }
+.fund-chat-row { display: flex; gap: 9px; }
+.fund-chat-row input { flex: 1; min-width: 0; border: 1px solid #cbd5e3; border-radius: 12px; background: #fbfcfe; color: var(--ink); padding: 11px 12px; outline: 0; font-size: 14px; }
+.fund-chat-row input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(39, 93, 245, .1); }
+.fund-chat .form-message { margin-top: 12px; white-space: pre-line; }
 .verified-source { display: inline-flex; gap: 5px; align-items: center; color: var(--mint); font-size: 10px; font-weight: 800; }
 .position-list { display: grid; gap: 11px; }
 .position-card { border: 1px solid var(--line); border-radius: 17px; padding: 14px; background: #fcfdff; }
