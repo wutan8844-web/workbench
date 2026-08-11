@@ -156,13 +156,14 @@ export function FundsPage({ user }: { user: User | null }) {
         <p><strong>这里显示基金公司披露后的最新单位净值,不编造盘中估算。</strong>交易日通常在收盘后更新;本页只用于持仓记录,不提供投资建议。</p>
       </section>
 
-      <section className="panel fund-chat">
+      <section className="panel" style={{ padding: 18 }}>
         <div className="section-heading">
-          <div><span className="eyebrow">对话记账</span><h2><MessageSquareText size={19} /> 说一句,记一笔</h2></div>
+          <div><span className="eyebrow">对话记账</span><h2 style={{ display: 'flex', alignItems: 'center', gap: 8 }}><MessageSquareText size={19} /> 说一句,记一笔</h2></div>
         </div>
-        <p className="fund-chat-hint">输入买入指令,自动按当日净值折算份额、重新计算平均成本。例如:「买入 500 中证500」「买 50 黄金」「买了100 2611」</p>
-        <div className="fund-chat-row">
+        <p style={{ color: 'var(--muted)', fontSize: 12, lineHeight: 1.6, margin: '0 0 12px' }}>输入买入指令,自动按当日净值折算份额、重新计算平均成本。例如:「买入 500 中证500」「买 50 黄金」「买了100 2611」</p>
+        <div style={{ display: 'flex', gap: 9 }}>
           <input
+            style={{ flex: 1, minWidth: 0, border: '1px solid #cbd5e3', borderRadius: 12, background: '#fbfcfe', color: 'var(--ink)', padding: '11px 12px', outline: 0, fontSize: 14 }}
             value={chatText}
             onChange={(event) => setChatText(event.target.value)}
             onKeyDown={(event) => { if (event.key === 'Enter') void handleChatSubmit() }}
@@ -171,7 +172,7 @@ export function FundsPage({ user }: { user: User | null }) {
           />
           <button className="button primary" onClick={() => void handleChatSubmit()} disabled={chatBusy}>{chatBusy ? '记账中…' : '记账'}</button>
         </div>
-        {chatMsg && <p className={chatMsg.type === 'ok' ? 'form-message' : 'form-message error'}>{chatMsg.text}</p>}
+        {chatMsg && <p className={chatMsg.type === 'ok' ? 'form-message' : 'form-message error'} style={{ marginTop: 12, whiteSpace: 'pre-line' }}>{chatMsg.text}</p>}
       </section>
 
       <section className="positions-section panel">
