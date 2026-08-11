@@ -63,12 +63,12 @@ export function FundsPage({ user }: { user: User | null }) {
           nav,
           shares: round4(newShares),
           fee: 0,
-          trade_date: new Date().toISOString().slice(0, 10),
+          trade_date: parsed.tradeDate,
           note: '工作台对话记账',
         })
       }
       setChatText('')
-      setChatMsg({ type: 'ok', text: `已记录:买入 ${matched.name} ${parsed.amount} 元\n净值 ${nav.toFixed(4)} · 新增份额 ${round4(newShares)}\n最新份额 ${round4(totalShares)} · 新成本净值 ${round6(newCost)}` })
+      setChatMsg({ type: 'ok', text: `已记录:${parsed.tradeDate} 买入 ${matched.name} ${parsed.amount} 元\n净值 ${nav.toFixed(4)} · 新增份额 ${round4(newShares)}\n最新份额 ${round4(totalShares)} · 新成本净值 ${round6(newCost)}` })
     } catch (error) {
       setChatMsg({ type: 'err', text: error instanceof Error ? error.message : '记账失败,请稍后再试。' })
     } finally {

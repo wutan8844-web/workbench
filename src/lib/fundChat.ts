@@ -2,11 +2,35 @@
 // 规则移植自飞书遥控助手 record_fund_purchase(已在 Excel 账本上验证过)
 
 export type ParsedBuy =
-  | { amount: number; fundText: string }
+  | { amount: number; fundText: string; tradeDate: string }
   | { error: string }
 
 const COMPANY_PREFIXES =
   '易方达|华夏|博时|南方|广发|天弘|嘉实|汇添富|招商|富国|中欧|景顺|工银|华安|国泰|鹏华|兴全|交银|银华|建信|平安|华宝|申万|大成|诺安|海富通|融通|万家|长盛|信诚|新华|东吴|方正|浙商|财通|光大|中银|民生|安信|中泰|长城|圆信|英大|太平|国联安|中海|天治|金鹰|泰达|中加|永赢|先锋|西藏东财'
+
+const toDateStr = (d: Date) => {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+const addDays = (d: Date, n: number) => {
+  const copy = new Date(d)
+  copy.setDate(copy.getDate() + n)
+  return copy
+}
+
+// 解析买入日期:默认今天;支持 昨天/前天/8月9日/8-9/2026-08-09 等
+export function parseBuyDate(text: string, now = new Date()): string {
+  if (/昨天/.test(text)) return toDateStr(addDays(now, -1))
+  if (/前天/.test(text)) return toDateStr(addDays(now, -2))
+  const full = /(\d{4})[-/年](\d{1,2})[-/月](\d{1,2})日?/.exec(text)
+  if (full) return toDateStr(new Date(Number(full[1]), Number(full[2]) - 1, Number(full[3])))
+  const short = /(\d{1,2})月(\d{1,2})日?/.exec(text)
+  if (short) return toDateStr(new Date(now.getFullYear(), Number(short[1]) - 1, Number(short[2])))
+  return toDateStr(now)
+}
 
 export function parseBuyInput(text: string): ParsedBuy {
   const clean = text.trim()
@@ -41,7 +65,8 @@ export function parseBuyInput(text: string): ParsedBuy {
     return { error: '没有识别到金额。例如:买入 500 中证500' }
   }
 
-  // 2) 提取基金文本:删掉金额部分与干扰词
+  // 2) 提取基金文本:删掉金额部分、日期词与干扰词
+  const tradeDate = parseBuyDate(clean)
   let fundText = clean
   if (span) {
     let [s, e] = span
@@ -49,7 +74,10 @@ export function parseBuyInput(text: string): ParsedBuy {
     while (s > 0 && fundText[s - 1] === ' ') s -= 1
     fundText = fundText.slice(0, s) + fundText.slice(e)
   }
-  fundText = fundText.replace(/(?:我|今天|刚才|上午|下午|这会儿|这会)+/g, '')
+  fundText = fundText.replace(/(?:昨天|前天|今天|昨天早上|昨天下午|刚才|这会儿|这会)+/g, '')
+  fundText = fundText.replace(/\d{4}[-/年]\d{1,2}[-/月]\d{1,2}日?/g, '')
+  fundText = fundText.replace(/\d{1,2}月\d{1,2}日?/g, '')
+  fundText = fundText.replace(/(?:我|刚才|上午|下午)+/g, '')
   fundText = fundText.replace(/(?:买了|买入|买基金|买)\s*/g, '')
   fundText = fundText.replace(/(?:了|的|约|大概|差不多|共|一共|投入|花了|一份)/g, '')
   fundText = fundText.replace(/\s+/g, ' ').trim()
@@ -61,7 +89,7 @@ export function parseBuyInput(text: string): ParsedBuy {
   if (!fundText) {
     return { error: '没有识别到基金。例如:买入 500 中证500' }
   }
-  return { amount, fundText }
+  return { amount, fundText, tradeDate }
 }
 
 type Matchable = { code: string; name: string; groupName: string }
